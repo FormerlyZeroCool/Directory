@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 
-public class UserManagerForm extends JFrame
+public class UserManagerForm extends ProgFrame
 {
 
 	/**
@@ -32,6 +32,8 @@ public class UserManagerForm extends JFrame
 	private UserData currentUser;
 	public UserManagerForm(UserData user)
 	{
+		super("UserManager");
+		setUser(user);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		String headers[]= {"User","Password","isAdmin"};
 		table=new JTable();
@@ -63,7 +65,7 @@ public class UserManagerForm extends JFrame
 		btnNewUser.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ProgramState.setState(ProgramState.NEW_USER);
+				ProgramState.setState("NewUser");
 				
 			}
 		});
@@ -118,10 +120,20 @@ public class UserManagerForm extends JFrame
 		
 		model.setColumnIdentifiers(headers);
 	}
-	public void setUser(UserData currentUser2) {
-		currentUser=currentUser2;
+	public void setUser(UserData currentUser) {
+		this.currentUser=currentUser;
 		
 	}
+	@Override
+	public void onLoad() 
+	{
+		this.refreshTable();
+		this.setTitle("Manage Users");
+	}
+	@Override
+	public void onClose() {}
+	@Override
+	public void whileRunning() {}
 	
 
 }

@@ -209,8 +209,8 @@ public class JsonObject {
 	{
 		this.name=name;
 	}
-	private int getDataType() {
-		// TODO Auto-generated method stub
+	private int getDataType() 
+	{
 		return dataType;
 	}
 	private void buildObject()

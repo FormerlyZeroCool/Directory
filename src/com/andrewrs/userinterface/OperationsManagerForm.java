@@ -1,29 +1,26 @@
 package com.andrewrs.userinterface;
 
+import com.andrewrs.jsonparser.JsonObjectification;
+import com.andrewrs.main.AdminDirectoryMain;
+
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
-import com.andrewrs.jsonparser.JsonObjectification;
-import com.andrewrs.main.AdminDirectoryMain;
 import javax.swing.JLabel;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
-import java.awt.event.KeyAdapter;
 
-public class OperationsManagerForm extends JFrame
+public class OperationsManagerForm extends ProgFrame
 {
 
 	/**
@@ -116,7 +113,7 @@ public class OperationsManagerForm extends JFrame
 	}
 	public OperationsManagerForm()
 	{
-		
+		super("OperationManager");
 	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 	this.setSize(700,650);
 
@@ -165,14 +162,6 @@ public class OperationsManagerForm extends JFrame
 	comboEndTimes = new ComboTime();
 	panel_6.add(comboEndTimes);
 	
-	comboEndTimes.addKeyListener(new KeyAdapter() {
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_ENTER && location.getId().length()>0)
-				saveNewOperationTime();//calls refreshOperationsData
-			
-		}
-	});
 	comboStartTimes.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			comboEndTimes.setSelectedIndex(comboStartTimes.getSelectedIndex());
@@ -296,7 +285,7 @@ public class OperationsManagerForm extends JFrame
 				operations = null;
 				newLocationName.textField.setText("");
 				daySelector.clear();
-				ProgramState.setState(ProgramState.MANAGE_LOCATIONS);
+				ProgramState.setState("LocationManager");
 		}
 	});
 	btnRefreshTable.addMouseListener(new MouseAdapter() {
@@ -310,6 +299,7 @@ public class OperationsManagerForm extends JFrame
 			else
 				setTitle("Error Saving, Please enter a Name");
 			
+			setNewLocationPanesVisibility(false);
 		}
 	});
 	table.addKeyListener(new KeyListener() {
@@ -337,7 +327,7 @@ public class OperationsManagerForm extends JFrame
 			}
 			else if(e.getKeyCode()==KeyEvent.VK_ESCAPE)
 			{
-				 ProgramState.setState(ProgramState.MANAGE_LOCATIONS);				
+				 ProgramState.setState("LocationManager");				
 			}
 		}
 
@@ -469,5 +459,17 @@ public class OperationsManagerForm extends JFrame
 		}
 		this.setData(newData.locationOperations);
 		this.setTitle("Locations Editor New Location Saved");
+	}
+
+	@Override
+	public void onLoad() {}
+
+	@Override
+	public void onClose() {}
+
+	@Override
+	public void whileRunning() 
+	{
+		this.repaint();		
 	}
 }

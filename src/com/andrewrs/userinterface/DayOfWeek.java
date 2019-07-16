@@ -53,30 +53,7 @@ public class DayOfWeek
 		}
 		int sy=y+25;
 		int sx=x+5;
-		switch(dayOfWeek)
-		{
-		case 0:
-			g.drawString("Sunday",sx, sy);
-			break;
-		case 1:
-			g.drawString("Monday",sx, sy);
-			break;
-		case 2:
-			g.drawString("Tuesday",sx, sy);
-			break;
-		case 3:
-			g.drawString("Wednesday",sx, sy);
-			break;
-		case 4:
-			g.drawString("Thursday",sx, sy);
-			break;
-		case 5:
-			g.drawString("Friday",sx, sy);
-			break;
-		case 6:
-			g.drawString("Saturday",sx, sy);
-			break;
-		}
+		g.drawString(getDayName(),sx, sy);
 		
 	}
 	public String getDayName()

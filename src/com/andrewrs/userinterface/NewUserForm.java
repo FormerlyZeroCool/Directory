@@ -1,6 +1,5 @@
 package com.andrewrs.userinterface;
 
-import javax.swing.JFrame;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.SwingConstants;
 
-public class NewUserForm extends JFrame
+public class NewUserForm extends ProgFrame
 {
 	/**
 	 * 
@@ -31,11 +30,13 @@ public class NewUserForm extends JFrame
 	private JLabel lblPasswordMessage,lblUserMsg1,lblUsermsg2;
 	public NewUserForm()
 	{
+		super("NewUser");
 		init();
 	}
 
 	public NewUserForm(UserData user) 
 	{
+		super("NewUser");
 		init();
 	}
 	private void init()
@@ -187,7 +188,7 @@ public class NewUserForm extends JFrame
 		newUser.postUser();
 		{
 			lblUserMsg1.setText("Accepted");
-			ProgramState.setState(ProgramState.MANAGE_USERS);
+			ProgramState.setState("ManageUsers");
 		}
 		
 	}
@@ -198,5 +199,23 @@ public class NewUserForm extends JFrame
 		userName.setText("");
 		passwordField.setText("");
 		chkIsAdmin.setSelected(false);
+	}
+
+	@Override
+	public void onLoad() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onClose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void whileRunning() {
+		// TODO Auto-generated method stub
+		
 	}
 }

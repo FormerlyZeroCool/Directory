@@ -33,7 +33,7 @@ public class AdminMenu extends JMenuBar
 
 			public void actionPerformed(ActionEvent e) {
 			
-					ProgramState.setState(ProgramState.MANAGE_USERS);
+					ProgramState.setState("UserManager");
 				
 			}
 			
@@ -41,7 +41,7 @@ public class AdminMenu extends JMenuBar
 		addUser.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-					ProgramState.setState(ProgramState.NEW_USER);
+					ProgramState.setState("NewUser");
 				
 				
 			}
@@ -50,7 +50,7 @@ public class AdminMenu extends JMenuBar
 		manageLocation.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-					ProgramState.setState(ProgramState.MANAGE_LOCATIONS);
+					ProgramState.setState("LocationManager");
 			}
 			
 		});
