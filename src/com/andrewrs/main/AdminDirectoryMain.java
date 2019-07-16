@@ -27,7 +27,7 @@ public class AdminDirectoryMain
 		
 		LoginForm login = new LoginForm("Login");
 		
-		while(login.isLoggedIn())
+		while(!login.isLoggedIn())
 		{
 			try {
 				Thread.sleep(100);
