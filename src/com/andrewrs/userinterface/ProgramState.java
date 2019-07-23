@@ -6,7 +6,7 @@ public class ProgramState {
 	private static String state = "";
 	private static String lastState = state;
 
-	public static HashMap<String,ProgFrame> FRAMES = new HashMap<String,ProgFrame>(8,0.75f);
+	public static HashMap<String,ProgFrame> FRAMES = new HashMap<String,ProgFrame>(8,0.65f);
 	
 	public static void addFrame(ProgFrame newFrame) throws Exception
 	{

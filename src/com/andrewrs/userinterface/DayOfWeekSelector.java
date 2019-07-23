@@ -48,6 +48,8 @@ public class DayOfWeekSelector extends JPanel
 				{
 					days.get(i).onClick(x, y);
 				}
+
+				repaint();
 			}});
 	}
 	public DayOfWeekSelector(Rectangle bounds)

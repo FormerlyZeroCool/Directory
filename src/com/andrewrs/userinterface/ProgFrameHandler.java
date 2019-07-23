@@ -10,11 +10,12 @@ public class ProgFrameHandler
 	{
 		ProgramState.freezeState();	
 	}
-	public void update()
+	public void update() throws Exception
 	{
 		boolean running = false;
-		
+
 		ProgFrame currentFrame = ProgramState.FRAMES.get(ProgramState.getState());
+		
 			if(!ProgramState.getLastState().equals(ProgramState.getState()))
 			{
 				if(ProgramState.getLastState().length()>0)
@@ -22,6 +23,8 @@ public class ProgFrameHandler
 					ProgFrame lastFrame = ProgramState.FRAMES.get(ProgramState.getLastState());
 					lastFrame.setVisible(false);
 					lastFrame.onClose();
+					if(currentFrame == null)
+						throw new Exception("Error Switching to new state check " + lastFrame.getName());
 				}
 				currentFrame.onLoad();
 				currentFrame.setVisible(true);

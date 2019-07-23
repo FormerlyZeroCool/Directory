@@ -188,7 +188,7 @@ public class NewUserForm extends ProgFrame
 		newUser.postUser();
 		{
 			lblUserMsg1.setText("Accepted");
-			ProgramState.setState("ManageUsers");
+			ProgramState.setState("UserManager");
 		}
 		
 	}

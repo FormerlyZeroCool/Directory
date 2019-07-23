@@ -48,7 +48,6 @@ public class DayOfWeek
 		{
 			g.drawLine(x, y+j, x+width-j, y+j);
 			g.drawLine(x, y+height-j, x+width-j, y+height-j);
-			//g.drawLine(x+width-j, y, x+width-j, y+height-j);
 			j++;
 		}
 		int sy=y+25;

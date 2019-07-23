@@ -253,6 +253,7 @@ public class OperationsManagerForm extends ProgFrame
 				saveError = true;
 			}
 			refreshOperationsData();
+			refreshTable();
 			if(!saveError)
 			{
 				StringBuilder deletedData = new StringBuilder(toBeDeleted.getDayOfWeek());
@@ -441,6 +442,9 @@ public class OperationsManagerForm extends ProgFrame
 		newLocationName.setVisible(isVisible);
 		newLocationRoom.setVisible(isVisible);
 		newLocationAddress.setVisible(isVisible);
+	}
+	public void clearTable()
+	{
 		((DefaultTableModel) table.getModel()).setRowCount(0);
 	}
 	private void saveNewLocation()

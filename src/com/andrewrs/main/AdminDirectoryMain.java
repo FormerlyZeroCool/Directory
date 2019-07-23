@@ -49,11 +49,13 @@ public class AdminDirectoryMain
 		ProgramState.setState("LocationManager");
 		while(frame.isRunning())
 		{
-			//System.out.println("running");
-			frame.update();
 			try {
+			frame.update();
+			
 				Thread.sleep(50);
-			} catch (InterruptedException e) {
+			}
+			catch(Exception e)
+			{
 				e.printStackTrace();
 			}
 		}

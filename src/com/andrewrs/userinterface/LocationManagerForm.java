@@ -316,11 +316,12 @@ public class LocationManagerForm extends ProgFrame
 	@Override
 	public void onClose() 
 	{
-		this.setVisible(false);	
+		
 		OperationsManagerForm operationsManagerForm = AdminDirectoryMain.OPERATIONSMANAGERFORM;
 		if(this.getSelectedLocationIndex()>-1)
 		{
 			operationsManagerForm.setNewLocationPanesVisibility(false);
+			operationsManagerForm.clearTable();
 			operationsManagerForm.setData(
 					this.getLocationOperationsData(
 							this.getSelectedLocationIndex()));
@@ -331,10 +332,7 @@ public class LocationManagerForm extends ProgFrame
 		}
 	}
 	@Override
-	public void whileRunning() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void whileRunning() {}
 
 	//May use this in the future
 	/*private int getIndexByLocation(LocationData data) 

@@ -23,11 +23,9 @@ public class HTTPHandler
 			con.setRequestMethod("GET");
 			con.setDoOutput(false);
 	        InputStream io=con.getInputStream();
-			byte body[]=new byte[con.getContentLength()];
-	        for(int i=0;i<con.getContentLengthLong();i++)
-			{
-				body[i]=(byte) io.read();
-			}
+
+			byte body[] = io.readAllBytes();
+			
 	        con.disconnect();
 	        System.out.println("Get from:"+path+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
 		       
@@ -46,11 +44,9 @@ public class HTTPHandler
 			con.setRequestMethod("GET");
 			con.setDoOutput(false);
 	        InputStream io=con.getInputStream();
-			byte body[]=new byte[con.getContentLength()];
-	        for(int i=0;i<con.getContentLengthLong();i++)
-			{
-				body[i]=(byte) io.read();
-			}
+
+			byte body[] = io.readAllBytes();
+			
 	        System.out.println("Get By ID "+path+"/"+id+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
 	        con.disconnect();
 	        return new String(body);
@@ -68,11 +64,9 @@ public class HTTPHandler
 			con.setRequestMethod("DELETE");
 			con.setDoOutput(false);
 	        InputStream io=con.getInputStream();
-			byte body[]=new byte[con.getContentLength()];
-	        for(int i=0;i<con.getContentLengthLong();i++)
-			{
-				body[i]=(byte) io.read();
-			}
+
+			byte body[] = io.readAllBytes();
+			
 	        System.out.println("Delete by ID: "+path+"/"+id+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
 	        con.disconnect();
 	        
@@ -112,11 +106,9 @@ public class HTTPHandler
 		io.flush();
         System.out.println("   Sent Data "+json);
         InputStream input=con.getInputStream();
-        byte arrResp[]=new byte[con.getContentLength()];
-        for(int i=0;i<con.getContentLengthLong();i++)
-		{
-			arrResp[i]=(byte) input.read();
-		}
+
+		byte arrResp[] = input.readAllBytes();
+		
         System.out.println("   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(arrResp));
         int responseCode = con.getResponseCode();
 		con.disconnect();   
@@ -144,11 +136,9 @@ public class HTTPHandler
 		io.flush();
         System.out.println("   Sent Data "+json);
         InputStream input=con.getInputStream();
-        byte arrResp[]=new byte[con.getContentLength()];
-        for(int i=0;i<con.getContentLengthLong();i++)
-		{
-			arrResp[i]=(byte) input.read();
-		}
+
+		byte arrResp[] = input.readAllBytes();
+		
         System.out.println("   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(arrResp));
         int responseCode = con.getResponseCode();
 		con.disconnect();   
@@ -176,11 +166,9 @@ public class HTTPHandler
 		io.flush();
         System.out.println("   Sent Data "+json);
         InputStream input=con.getInputStream();
-        byte arrResp[]=new byte[con.getContentLength()];
-        for(int i=0;i<con.getContentLengthLong();i++)
-		{
-			arrResp[i]=(byte) input.read();
-		}
+
+		byte arrResp[] = input.readAllBytes();
+		
         System.out.println("   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(arrResp));
 		con.disconnect();   
 		return new String(arrResp);
