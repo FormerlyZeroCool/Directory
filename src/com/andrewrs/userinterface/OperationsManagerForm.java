@@ -106,7 +106,7 @@ public class OperationsManagerForm extends ProgFrame
 	{
 		operations = data;
 		location = data.parent;
-		System.out.println("From Operations.setData() "+data.jsonify());
+		System.out.println("From OperationsManager.setData() "+data.jsonify());
 		this.setTitle(location.getName()+" Operations");
 		updateLocationInfoLabels();
 		refreshTable();
@@ -437,7 +437,7 @@ public class OperationsManagerForm extends ProgFrame
 	}
 	public void setNewLocationPanesVisibility(boolean isVisible) 
 	{	
-		System.out.println("Setting Up for new Operations in Method: setNewLocationPanesVisibility");
+		System.out.println("Setting Up for new Operations in Method: OperationsManager.setNewLocationPanesVisibility");
 		updateLocationInfoLabels();
 		newLocationName.setVisible(isVisible);
 		newLocationRoom.setVisible(isVisible);

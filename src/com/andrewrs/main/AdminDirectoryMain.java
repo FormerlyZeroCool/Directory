@@ -20,17 +20,17 @@ public class AdminDirectoryMain
 	public static void main(String args[])
 	{
 		try {
-			HTTP=new HTTPHandler("https://qj7reyhuy0.execute-api.us-east-1.amazonaws.com/dev/api");
+			HTTP=new HTTPHandler("your Web Service URL");
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
 		
 		LoginForm login = new LoginForm("Login");
-		
-		while(!login.isLoggedIn())
+
+		while(login.isLoggedIn())
 		{
 			try {
-				Thread.sleep(100);
+				Thread.sleep(30);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

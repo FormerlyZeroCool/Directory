@@ -6,12 +6,12 @@ import com.andrewrs.jsonparser.JsonObjectification;
 import com.andrewrs.main.AdminDirectoryMain;
 import com.andrewrs.ws.StringKeyPairs;
 
-public class LocationData 
+public class LocationData
 {
 
-	private String name="",room="",address="",id="";
+	private String name="",room="",address="",contactEmail="",telephone="",id="";
 	public OperationsData locationOperations;
-	public LocationData(JsonObject data)//Should be an individual location's Object
+	public LocationData(JsonObject data)//Should be an individual location's Data
 	{
 		id = data.getChild("_id").getData();
 		
@@ -25,6 +25,12 @@ public class LocationData
 			setAddress(data.getChild("Address").getData());
 
 		if(data.getChild("Operations")!=null)
+			locationOperations = new OperationsData(data.getChild("Operations"),this);
+
+		if(data.getChild("Telephone")!=null)
+			setAddress(data.getChild("Address").getData());
+
+		if(data.getChild("ContactEmail")!=null)
 			locationOperations = new OperationsData(data.getChild("Operations"),this);
 	}
 	public LocationData(String name,String room,String address)
@@ -75,6 +81,8 @@ public class LocationData
 		data.add(new StringKeyPairs("name",name,StringKeyPairs.STRING));
 		data.add(new StringKeyPairs("room",room,StringKeyPairs.STRING));
 		data.add(new StringKeyPairs("address",address,StringKeyPairs.STRING));
+		data.add(new StringKeyPairs("telephone",this.telephone,StringKeyPairs.STRING));
+		data.add(new StringKeyPairs("contactEmail",this.contactEmail,StringKeyPairs.STRING));
 		return jsonBuilder(data);
 	}
 
@@ -149,4 +157,21 @@ public class LocationData
 	{
 		this.id = id;
 	}
+	public String getContactEmail() 
+	{
+		return contactEmail;
+	}
+	public void setContactEmail(String contactEmail) 
+	{
+		this.contactEmail = contactEmail;
+	}
+	public String getTelephone() 
+	{
+		return telephone;
+	}
+	public void setTelephone(String telephone) 
+	{
+		this.telephone = telephone;
+	}
+	 
 }

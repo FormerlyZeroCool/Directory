@@ -8,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -29,11 +28,11 @@ public class LocationManagerForm extends ProgFrame
 	 */
 	private static final long serialVersionUID = 1L;
 	private ArrayList<LocationData> locations;
+	private ArrayList<LocationData> filteredLocations;
 	private final JTable table; 
 	private final JTextField textFieldLocationNameFilter;
 	private final JTextField textFieldLocationRoomFilter;
 	private final JTextField textFieldLocationAddressFilter;
-	private String nameText,roomText,addressText;
 	public void refreshLocationsData()
 	{
 		locations.clear();
@@ -45,19 +44,16 @@ public class LocationManagerForm extends ProgFrame
 				locations.add(new LocationData(location));
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}	
 	public void refreshTable()
 	{
-
-		Comparator<LocationData> compareByName = (LocationData o1, LocationData o2) ->
-        o1.getName().toLowerCase().compareTo( o2.getName().toLowerCase() );
-        Collections.sort(locations, compareByName);
+		Collections.sort(locations,new LocationDataComparator());
+		filteredLocations = new ArrayList<LocationData>();
 	    DefaultTableModel contactTableModel = (DefaultTableModel) table
 	            .getModel();
-		int columns = 4;
+		int columns = 6;
 		int rows = locations.size();
 		int selectedIndex = table.getSelectedRow();
 		String data[][] = new String[rows][columns];
@@ -66,15 +62,18 @@ public class LocationManagerForm extends ProgFrame
 		
 		for(int i = 0;i<locations.size();i++)
 		{
-			if(locations.get(i).getName().toLowerCase().contains(nameText.toLowerCase()) &&
-					locations.get(i).getRoom().toLowerCase().contains(roomText.toLowerCase()) &&
-					locations.get(i).getAddress().toLowerCase().contains(addressText.toLowerCase()) )
+			if(locations.get(i).getName().toLowerCase().contains(textFieldLocationNameFilter.getText().toLowerCase()) &&
+					locations.get(i).getRoom().toLowerCase().contains(textFieldLocationRoomFilter.getText().toLowerCase()) &&
+					locations.get(i).getAddress().toLowerCase().contains(textFieldLocationAddressFilter.getText().toLowerCase()) )
 			{
 				data[i][0] = locations.get(i).getId();
 				data[i][1] = locations.get(i).getName();
 				data[i][2] = locations.get(i).getRoom();
 				data[i][3] = locations.get(i).getAddress();
+				data[i][4] = locations.get(i).getTelephone();
+				data[i][5] = locations.get(i).getContactEmail();
 			    contactTableModel.addRow(data[i]);
+			    filteredLocations.add(locations.get(i));
 			}
 		}
 			if(selectedIndex != -1 && selectedIndex < table.getRowCount())
@@ -108,57 +107,31 @@ public class LocationManagerForm extends ProgFrame
 	textFieldLocationNameFilter.setColumns(10);
 	textFieldLocationNameFilter.addKeyListener(new KeyAdapter() {
 		@Override
-		public void keyPressed(KeyEvent e) {
-			//if(e.getKeyCode() == KeyEvent.VK_ENTER)
-			{
-				if(e.getKeyCode() != KeyEvent.VK_BACK_SPACE)
-					nameText = nameText + e.getKeyChar();
-				else
-					if(nameText.length() > 0)
-						nameText = nameText.substring(0, nameText.length()-1);
-				refreshTable();
-			}
+		public void keyReleased(KeyEvent e) {
+			refreshTable();
 		}
 	});
-	nameText = textFieldLocationNameFilter.getText();
 	
 	textFieldLocationRoomFilter = new JTextField();
 	textFieldLocationRoomFilter.addKeyListener(new KeyAdapter() {
 		@Override
-		public void keyPressed(KeyEvent e) {
-			//if(e.getKeyCode() == KeyEvent.VK_ENTER)
-			{
-				if(e.getKeyCode() != KeyEvent.VK_BACK_SPACE)
-					roomText = roomText + e.getKeyChar();
-				else
-					if(roomText.length() > 0)
-						roomText = roomText.substring(0, roomText.length()-1);
-				refreshTable();
-			}
+		public void keyReleased(KeyEvent e) {
+			refreshTable();
 		}
 	});
 	panel_1.add(textFieldLocationRoomFilter);
 	textFieldLocationRoomFilter.setColumns(10);
-	roomText = textFieldLocationRoomFilter.getText();
 	
 	textFieldLocationAddressFilter = new JTextField();
 	panel_1.add(textFieldLocationAddressFilter);
 	textFieldLocationAddressFilter.setColumns(10);
 	textFieldLocationAddressFilter.addKeyListener(new KeyAdapter() {
 		@Override
-		public void keyPressed(KeyEvent e) {
-			//if(e.getKeyCode() == KeyEvent.VK_ENTER)
-			{
-				if(e.getKeyCode() != KeyEvent.VK_BACK_SPACE)
-					addressText = addressText + e.getKeyChar();
-				else
-					if(addressText.length() > 0)
-						addressText = addressText.substring(0, addressText.length()-1);
-				refreshTable();
-			}
+		public void keyReleased(KeyEvent e) {
+			refreshTable();
+			
 		}
 	});
-	addressText = textFieldLocationAddressFilter.getText();
 	
 	JLabel label_1 = new JLabel("");
 	panel_1.add(label_1);
@@ -237,7 +210,7 @@ public class LocationManagerForm extends ProgFrame
 	};
 	table=new JTable(model);
 	panel_2.add(table, BorderLayout.CENTER);
-	String headers[]= {"ID","Name","Room","Address"};
+	String headers[]= {"ID","Name","Room","Address","Contact Email","Telephone"};
     DefaultTableModel contactTableModel = (DefaultTableModel) table
             .getModel();
     contactTableModel.setColumnIdentifiers(headers);
@@ -256,15 +229,9 @@ public class LocationManagerForm extends ProgFrame
 			}
 		}
 
-		public void keyTyped(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void keyTyped(KeyEvent e) {}
 
-		public void keyReleased(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void keyReleased(KeyEvent e) {}
 	});
 	refreshLocationsData();
 	refreshTable();
@@ -279,6 +246,8 @@ public class LocationManagerForm extends ProgFrame
 		loc.setName((String) tableModel.getValueAt(table.getSelectedRow(),1));
 		loc.setRoom((String) tableModel.getValueAt(table.getSelectedRow(),2));
 		loc.setAddress((String) tableModel.getValueAt(table.getSelectedRow(),3));
+		loc.setContactEmail((String) tableModel.getValueAt(table.getSelectedRow(),4));
+		loc.setTelephone((String) tableModel.getValueAt(table.getSelectedRow(),5));
 		loc.save();
 		refreshLocationsData();
 		refreshTable();
@@ -304,7 +273,7 @@ public class LocationManagerForm extends ProgFrame
 	}
 	public OperationsData getLocationOperationsData(int index) 
 	{
-		return locations.get(index).locationOperations;
+		return filteredLocations.get(index).locationOperations;
 	}
 	@Override
 	public void onLoad() 

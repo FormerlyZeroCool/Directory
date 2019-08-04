@@ -23,7 +23,7 @@ public class UserService
 		map.add(new StringKeyPairs("_id", userId,StringKeyPairs.STRING));
 		map.add(new StringKeyPairs("username", user.getUserName(),StringKeyPairs.STRING));
 		map.add(new StringKeyPairs("password", user.getHashedPass().toString(),StringKeyPairs.STRING));
-		map.add(new StringKeyPairs("__v", Integer.toString(user.isAdmin()?1:0),StringKeyPairs.INT));
+		map.add(new StringKeyPairs("isAdmin", Integer.toString(user.isAdmin()?1:0),StringKeyPairs.INT));
 		
 		System.out.println(jsonBuilder(map));
         try {
@@ -40,7 +40,7 @@ public class UserService
 		//map.add(new StringKeyPairs("_id", userId,StringKeyPairs.STRING));
 		map.add(new StringKeyPairs("username", user.getUserName(),StringKeyPairs.STRING));
 		map.add(new StringKeyPairs("password", user.getHashedPass().toString(),StringKeyPairs.STRING));
-		map.add(new StringKeyPairs("__v", Integer.toString(user.isAdmin()?1:0),StringKeyPairs.INT));
+		map.add(new StringKeyPairs("isAdmin", Boolean.toString(user.isAdmin()),StringKeyPairs.INT));
 		
 		System.out.println(jsonBuilder(map));
         try {
@@ -58,7 +58,7 @@ public class UserService
         JsonObjectification data = new JsonObjectification(bodyResp);
         record.setUserName(data.jsonObject.getChild("userName").getData());
         record.setHashedPass(new BigInteger(data.jsonObject.getChild("password").getData()));
-        record.setAdmin(data.jsonObject.getChild("__v").getData().equals("1"));
+        record.setAdmin(data.jsonObject.getChild("isAdmin").getData().equals("true"));
         
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
