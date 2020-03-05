@@ -484,6 +484,8 @@ public class OperationsManagerForm extends ProgFrame
 		newLocationName.textField.setText("");
 		newLocationRoom.textField.setText("");
 		newLocationAddress.textField.setText("");
+		newLocationEmail.textField.setText("");
+		newLocationPhone.textField.setText("");
 		setNewLocationPanesVisibility(false);
 	}
 
