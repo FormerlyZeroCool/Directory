@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class HTTPHandler 
@@ -41,7 +42,7 @@ public class HTTPHandler
 	public String getDataById(String path,String id)
 	{
 		try{
-			URL url=new URL(urlString+"/"+path+"/"+id);
+			URL url=new URL(urlString+"/"+path+":"+id);
 			con=(HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 			con.setDoOutput(false);
@@ -52,7 +53,7 @@ public class HTTPHandler
 				body[i] = (byte) io.read();
 			//byte body[] = io.readAllBytes();
 			
-	        System.out.println("Get By ID "+path+"/"+id+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
+	        System.out.println("Get By ID "+path+":"+id+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
 	        con.disconnect();
 	        return new String(body);
 		}catch(Exception e)
@@ -60,11 +61,44 @@ public class HTTPHandler
 			e.printStackTrace();
 			return "Error 500";
 		}
+	}	
+	public int deleteByAttribute(String path,String json) throws Exception
+	{
+		System.out.println("Delete by Attribute: "+path);
+		try{
+			URL url=new URL(urlString+"/"+path);
+		con=(HttpURLConnection) url.openConnection();
+		con.setRequestMethod("DELETE");
+        con.setRequestProperty("Content-Type", "application/json");
+		con.setDoOutput(true);
+		OutputStream io=con.getOutputStream();
+		byte arr[]=json.getBytes();
+		
+		for(int i=0;i<arr.length;i++)
+				io.write(arr[i]);
+		io.flush();
+        System.out.println("   Filter Data: "+json);
+        InputStream input=con.getInputStream();
+
+		byte arrResp[] = new byte[con.getContentLength()];
+		for(int i=0;i<con.getContentLength();i++)
+			arrResp[i] = (byte) input.read();
+		//byte arrResp[] = input.readAllBytes();
+		
+        System.out.println("   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(arrResp));
+        int responseCode = con.getResponseCode();
+		con.disconnect();   
+		return responseCode;
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return 500;
+		}
 	}
 	public void deleteById(String path,String id)
 	{
 		try{
-			URL url=new URL(urlString+"/"+path+"/"+id);
+			URL url=new URL(urlString+"/"+path+":"+id);
 			con=(HttpURLConnection) url.openConnection();
 			con.setRequestMethod("DELETE");
 			con.setDoOutput(false);
@@ -75,7 +109,7 @@ public class HTTPHandler
 				body[i] = (byte) io.read();
 			//byte body[] = io.readAllBytes();
 			
-	        System.out.println("Delete by ID: "+path+"/"+id+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
+	        System.out.println("Delete by ID: "+path+":"+id+"\n   Response Code:"+con.getResponseCode() +"\n   Response Data: "+new String(body));
 	        con.disconnect();
 	        
 		}catch(Exception e)
@@ -112,7 +146,7 @@ public class HTTPHandler
 		for(int i=0;i<arr.length;i++)
 				io.write(arr[i]);
 		io.flush();
-        System.out.println("   Sent Data "+json);
+        System.out.println("   Sent Data: "+json);
         InputStream input=con.getInputStream();
 
 		byte arrResp[] = new byte[con.getContentLength()];

@@ -210,7 +210,7 @@ public class NewUserForm extends ProgFrame
 	@Override
 	public void onClose() {
 		// TODO Auto-generated method stub
-		
+		clearForm();
 	}
 
 	@Override

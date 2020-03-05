@@ -40,8 +40,8 @@ public class TimeBlock
 		if(parent.remove(this))
 		{
 			//get parent location now it should not contain this timeblock anymore as we removed it from this object's parent
-			LocationData location = parent.getParent().getParent();
-			AdminDirectoryMain.HTTP.putJsonString("locations/"+location.getId(), location.jsonify());
+			LocationData location = parent.getParent().getLocation();
+			AdminDirectoryMain.HTTP.putJsonString("locations:"+location.getId(), location.jsonify());
 		}
 		else
 			System.out.println("Nothing deleted from operations.dailytimes.timeblocks");

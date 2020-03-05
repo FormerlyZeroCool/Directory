@@ -2,15 +2,15 @@ package com.andrewrs.userinterface;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-
-import com.andrewrs.ws.UserService;
+import com.andrewrs.jsonparser.JsonObject;
+import com.andrewrs.jsonparser.JsonObjectification;
+import com.andrewrs.main.AdminDirectoryMain;
 
 public class UserData 
 {
 	private String userName;
 	private boolean isAdmin;
 	private BigInteger hashedPass;
-	private final UserService webService=new UserService(this);
 	private boolean isLoggedIn=false;
 	public boolean isLoggedIn() {
 		return isLoggedIn;
@@ -28,16 +28,34 @@ public class UserData
 		this.userName=userName;
 		this.isAdmin=isAdmin;
 		this.hashedPass=new BigInteger(pass);
+	}	
+	private ArrayList<UserData> getAllUserRecords()
+	{
+		ArrayList<UserData> users=new ArrayList<UserData>();
+		try{
+		
+        String bodyResp=AdminDirectoryMain.HTTP.getData("users");
+        JsonObjectification data = new JsonObjectification(bodyResp);
+        for(JsonObject child : data.jsonObject.children)
+        {
+        	users.add(
+        			new UserData(child.getChild("userName")!=null?child.getChild("userName").getData():"",
+        			child.getChild("password")!=null?child.getChild("password").getData():"",
+        			child.getChild("isAdmin")!=null?child.getChild("isAdmin").getData().equals("true"):false)
+        			);
+        }
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return users;
 	}
 	public ArrayList<UserData> getAllUsersData()
 	{
 		if(isAdmin)
-			return webService.getAllUserRecords();
+			return getAllUserRecords();
 		else 
-		{
-			ArrayList<UserData> dummy=new ArrayList<UserData>();
-			return dummy;
-		}
+			return new ArrayList<UserData>();
 	}
 	public UserData(String userName)
 	{
@@ -51,8 +69,16 @@ public class UserData
 	}
 	public void getPassFromWeb()
 	{
-		 BigInteger hexFormat=new BigInteger(LoginForm.hashPass(userName.toCharArray()).toString(),10);
-		 webService.updateLocalUserById(hexFormat.toString(16));
+		 try {
+	            String bodyResp=AdminDirectoryMain.HTTP.getData("users?userNameLower="+userName.toLowerCase().replace("@", "%40").replace(".","%2E"));
+	            JsonObjectification data = new JsonObjectification(bodyResp);
+	            setHashedPass(new BigInteger(data.jsonObject.getChild(0)!=null?data.jsonObject.getChild(0).getChild("password").getData():"0"));
+	            setAdmin(data.jsonObject.getChild(0).getChild("isAdmin")!= null?data.jsonObject.getChild(0).getChild("isAdmin").getData().equals("true"):false);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public String getUserId()
 	{
@@ -60,20 +86,26 @@ public class UserData
 	}
 	public void postUser()
 	{
-		webService.postUser();
+		String data = this.jsonify();
+		try {
+    		AdminDirectoryMain.HTTP.postJsonString("users", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	public String toString()
+	public String jsonify()
 	{
 		StringBuilder string=new StringBuilder();
-		string.append("userName:");
-		string.append(userName);
-		string.append("\n");
-		string.append("hashedPass:");
+		string.append('{');
+		string.append("\"userName\":\"");
+		string.append(userName.toLowerCase());
+		string.append("\",");
+		string.append("\"password\":\"");
 		string.append(hashedPass);
-		string.append("\n");
-		string.append("isAdmin:");
+		string.append("\",");
+		string.append("\"isAdmin\":");
 		string.append(isAdmin);
-		string.append("\n");
+		string.append("}");
 		return string.toString();
 	}
 	public String getUserName() {
@@ -109,12 +141,27 @@ public class UserData
 	}
 	public void save()
 	{
-		webService.putUser();
+        try {
+        	System.out.println("Attempting to save put to user id:");
+        	String id = this.getUserId();
+        	String data = this.jsonify();
+        	System.out.println();
+    		AdminDirectoryMain.HTTP.putJsonString("users:"+id, data);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+
 	}
 	public void deleteOnWS() 
 	{
-
+		System.out.print("Attemping to Delete User:");
 		System.out.println(getUserId());
-		webService.deleteUser(getUserId());
+
+        try {
+        	AdminDirectoryMain.HTTP.deleteByAttribute("users", jsonify());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

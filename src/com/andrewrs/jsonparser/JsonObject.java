@@ -186,8 +186,9 @@ public class JsonObject {
 			int fieldEndIndex=returnMin(getData().indexOf("}", begin+1),getData().indexOf("]", begin+1));
 			fieldEndIndex=returnMin(getData().indexOf(",", begin+1),fieldEndIndex);
 			endOfField=fieldEndIndex;
+
+				setData(getData().substring(begin +1, endOfField));
 			
-			setData(getData().substring(begin+1, endOfField+1));		
 			if(originalData.length()>=endOfField+1)
 				if(originalData.charAt(endOfField)==',')
 				{
@@ -302,8 +303,8 @@ public class JsonObject {
 			int fieldEndIndex=returnMin(getData().indexOf("}", end+1),getData().indexOf("]", end+1));
 			fieldEndIndex=returnMin(getData().indexOf(",", end+1),fieldEndIndex);
 			endOfField=fieldEndIndex;
-			
-			setData(getData().substring(begin+1, endOfField+1));	
+
+				setData(getData().substring(end +1, endOfField));	
 				
 			if(originalData.length()>=endOfField+1)
 				if(originalData.charAt(endOfField)==',')

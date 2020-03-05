@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import com.andrewrs.jsonparser.JsonObject;
 import com.andrewrs.ws.StringKeyPairs;
 
-public class OperationsData 
+public class OperationsData extends ArrayList<DailyTimes>
 {
 
-	public DailyTimes mon,tue,wed,thu,fri,sat,sun;
-	public final ArrayList<DailyTimes> times = new ArrayList<DailyTimes>();
-	public LocationData parent;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5160275643367775784L;
+	private DailyTimes mon,tue,wed,thu,fri,sat,sun;
+	public LocationData location;
 	public String jsonify()
 	{
 		ArrayList<StringKeyPairs> data =new ArrayList<StringKeyPairs>();
@@ -26,7 +29,7 @@ public class OperationsData
 	
 	public OperationsData(JsonObject data,LocationData parent)//JsonObject should be the Operations object already
 	{
-		this.parent=parent;
+		this.location=parent;
 		
 			mon=new DailyTimes(this,"Monday");
 			tue=new DailyTimes(this,"Tuesday");
@@ -36,45 +39,45 @@ public class OperationsData
 			sat=new DailyTimes(this,"Saturday");
 			sun=new DailyTimes(this,"Sunday");
 			
-			times.add(mon);
-			times.add(tue);
-			times.add(wed);
-			times.add(thu);
-			times.add(fri);
-			times.add(sat);
-			times.add(sun);
+			this.add(mon);
+			this.add(tue);
+			this.add(wed);
+			this.add(thu);
+			this.add(fri);
+			this.add(sat);
+			this.add(sun);
 			
 			JsonObject monday=data.getChild("Monday");
 			if(monday!=null)
-			for(JsonObject timeBlock:monday.children)
+			for(JsonObject timeBlock : monday.children)
 			{
 				mon.add(buildTimeBlock(mon,timeBlock));	
-			}			
+			}	
 		
 			JsonObject tuesday=data.getChild("Tuesday");
 			if(tuesday!=null)
-			for(JsonObject timeBlock:tuesday.children)
+			for(JsonObject timeBlock : tuesday.children)
 			{
 				tue.add(buildTimeBlock(tue,timeBlock));
 			}
 		
 			JsonObject wednesday=data.getChild("Wednesday");
 			if(wednesday!=null)
-			for(JsonObject timeBlock:wednesday.children)
+			for(JsonObject timeBlock : wednesday.children)
 			{
 				wed.add(buildTimeBlock(wed,timeBlock));
 			}
 		
 			JsonObject thursday=data.getChild("Thursday");
 			if(thursday!=null)
-			for(JsonObject timeBlock:thursday.children)
+			for(JsonObject timeBlock : thursday.children)
 			{
 				thu.add(buildTimeBlock(thu,timeBlock));
 			}
 		
 			JsonObject friday=data.getChild("Friday");
 			if(friday!=null)
-			for(JsonObject timeBlock:friday.children)
+			for(JsonObject timeBlock : friday.children)
 			{
 				fri.add(buildTimeBlock(fri,timeBlock));
 			}
@@ -98,7 +101,7 @@ public class OperationsData
 	public TimeBlock findTimeBlockById(String id)
 	{
 		TimeBlock data=null;
-		for(DailyTimes day : times)
+		for(DailyTimes day : this)
 		{
 			for(TimeBlock time: day)
 			{
@@ -121,8 +124,8 @@ public class OperationsData
 		String dayOfWeek = timeBlock.getParent().getName();
 		//System.out.println("day of week from build time block operations data: "+dayOfWeek);
 		boolean 
-		isStartAm = timeBlock.getChild("isStartAm").getData().equals("1")?true:false,
-		isEndAm = timeBlock.getChild("isEndAm").getData().equals("1")?true:false;
+		isStartAm = timeBlock.getChild("isStartAm").getData().equals("true")?true:false,
+		isEndAm = timeBlock.getChild("isEndAm").getData().equals("true")?true:false;
 		
 		
 		if(timeBlock.getChild("startHour").getData().length()>0)
@@ -173,15 +176,13 @@ public class OperationsData
 			else if(entry.getDataType()==StringKeyPairs.ARRAY)
 			{
 				appender.append("[");
-					appender.append(entry.getValue());
-					appender.append("]");
-					
+				appender.append(entry.getValue());
+				appender.append("]");	
 			}
 			else if(entry.getDataType()==StringKeyPairs.OBJECT)
 			{
 				appender.append("{");
-					appender.append(entry.getValue());
-				
+				appender.append(entry.getValue());
 				appender.append("}");
 			}
 			else
@@ -200,7 +201,7 @@ public class OperationsData
 	public void addTimeBlock(String dayName, String startHour, String startMinute, boolean isStartAm, String endHour,
 			String endMinute, boolean isEndAm) 
 	{
-		times.get(getDayIndex(dayName)).add(new TimeBlock(times.get(getDayIndex(dayName)),"",dayName,Integer.parseInt(startHour),
+		this.get(getDayIndex(dayName)).add(new TimeBlock(this.get(getDayIndex(dayName)),"",dayName,Integer.parseInt(startHour),
 				Integer.parseInt(startMinute),
 				isStartAm,
 				Integer.parseInt(endHour),
@@ -212,9 +213,9 @@ public class OperationsData
 	{
 		int index = -1;
 		
-		for(int i = 0;i<times.size() && index==-1;i++)
+		for(int i = 0;i<this.size() && index==-1;i++)
 		{
-			if(times.get(i).getName().toLowerCase().equals(name.toLowerCase()))
+			if(this.get(i).getName().toLowerCase().equals(name.toLowerCase()))
 			{
 				index=i;
 			}
@@ -222,8 +223,18 @@ public class OperationsData
 		return index;
 	}
 
-	public LocationData getParent() {
-		// TODO Auto-generated method stub
-		return parent;
+	public int getTimeCount()
+	{
+		return	this.mon.size()+
+				this.tue.size()+
+				this.wed.size()+
+				this.thu.size()+
+				this.fri.size()+
+				this.sat.size()+
+				this.sun.size();
+	}
+	public LocationData getLocation() 
+	{
+		return location;
 	}
 }

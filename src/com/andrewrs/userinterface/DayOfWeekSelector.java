@@ -14,6 +14,7 @@ public class DayOfWeekSelector extends JPanel
 	 * A Graphical Element that displays the days of the week, and saves the state of which days have been selected
 	 */
 	private static final long serialVersionUID = 1L;
+	public static final int DAY_COUNT = 7;
 	private ArrayList<DayOfWeek> days;
 	
 	public DayOfWeekSelector(int x,int y,int width, int height)

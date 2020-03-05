@@ -1,5 +1,6 @@
 package com.andrewrs.userinterface;
 
+import com.andrewrs.jsonparser.JsonObject;
 import com.andrewrs.jsonparser.JsonObjectification;
 import com.andrewrs.main.AdminDirectoryMain;
 
@@ -33,7 +34,7 @@ public class OperationsManagerForm extends ProgFrame
 	private final DayOfWeekSelector daySelector;
 	private final ComboTime comboStartTimes,comboEndTimes;
 	private final JLabel lblLocationAddressAndRoom,lblLocationName;
-	private final TextBoxPanel newLocationName,newLocationRoom,newLocationAddress;
+	private final TextBoxPanel newLocationName,newLocationRoom,newLocationAddress,newLocationEmail,newLocationPhone;
 	public void refreshOperationsData()
 	{
 
@@ -42,6 +43,7 @@ public class OperationsManagerForm extends ProgFrame
 			JsonObjectification objectifiedJson = new JsonObjectification(json);
 			operations = new OperationsData(objectifiedJson.jsonObject.getChild("operations"),location);
 			location.setOperations(operations);
+			clearTable();
 			refreshTable();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -55,14 +57,7 @@ public class OperationsManagerForm extends ProgFrame
 	    DefaultTableModel contactTableModel = (DefaultTableModel) table
 	            .getModel();
 		int columns = 3;
-		int rows = 
-				operations.mon.size()+
-				operations.tue.size()+
-				operations.wed.size()+
-				operations.thu.size()+
-				operations.fri.size()+
-				operations.sat.size()+
-				operations.sun.size();
+		int rows = operations.getTimeCount();
 		int selectedIndex=table.getSelectedRow();
 		tableData = new String[rows][columns];
 		idList = new String[rows];
@@ -71,9 +66,9 @@ public class OperationsManagerForm extends ProgFrame
 
 		
 		int counter = 0;
-		for(int i = 0;i<operations.times.size();i++)
+		for(int i = 0;i<operations.size();i++)
 		{
-			for(TimeBlock time : operations.times.get(i))
+			for(TimeBlock time : operations.get(i))
 			{
 				StringBuilder startTimeStr = new StringBuilder(Integer.toString(time.getStartHour()));
 				startTimeStr.append(":");
@@ -89,6 +84,7 @@ public class OperationsManagerForm extends ProgFrame
 					idList[counter] = time.getId();//Must be set to save updated operations
 					tableData[counter][0] = time.getDayOfWeek().substring(0, 1).toUpperCase()+
 							time.getDayOfWeek().substring(1).toLowerCase();
+					
 					tableData[counter][1] = startTimeStr.toString();
 					tableData[counter][2] = endTimeStr.toString();
 				    contactTableModel.addRow(tableData[counter]);
@@ -105,7 +101,7 @@ public class OperationsManagerForm extends ProgFrame
 	public void setData(OperationsData data)
 	{
 		operations = data;
-		location = data.parent;
+		location = data.location;
 		System.out.println("From OperationsManager.setData() "+data.jsonify());
 		this.setTitle(location.getName()+" Operations");
 		updateLocationInfoLabels();
@@ -211,7 +207,7 @@ public class OperationsManagerForm extends ProgFrame
     
     
 	getContentPane().add(new JScrollPane(table));
-	panel_5.setLayout(new GridLayout(0, 4, 0, 0));
+	panel_5.setLayout(new GridLayout(0, 5, 0, 0));
 	
 	newLocationName = new TextBoxPanel("Location Name:");
 	panel_5.add(newLocationName);
@@ -220,14 +216,16 @@ public class OperationsManagerForm extends ProgFrame
 	newLocationRoom = new TextBoxPanel("Room Number:");
 	panel_5.add(newLocationRoom);
 		
-		newLocationAddress = new TextBoxPanel("Address:");
-		panel_5.add(newLocationAddress);
-		JPanel panel_12 = new JPanel();
-		panel_5.add(panel_12);
+	newLocationAddress = new TextBoxPanel("Address:");
+	panel_5.add(newLocationAddress);
+
+	newLocationEmail = new TextBoxPanel("Email:");
+	panel_5.add(newLocationEmail);
+	newLocationPhone = new TextBoxPanel("Phone:");
+	panel_5.add(newLocationPhone);
 	panel_3.setBounds(0, 0, this.getWidth(), 60);
 	daySelector=new DayOfWeekSelector(panel_3.getBounds());
 	panel_3.add(daySelector);
-	panel_12.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	
 	JPanel panel_9 = new JPanel();
 	FlowLayout flowLayout = (FlowLayout) panel_9.getLayout();
@@ -292,15 +290,7 @@ public class OperationsManagerForm extends ProgFrame
 	btnRefreshTable.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if(newLocationName.textField.getText().length()>0)
-				saveNewLocation();
-
-			if(newLocationName.textField.getText().length()>0 || !newLocationName.isVisible())
-			saveOperations();
-			else
-				setTitle("Error Saving, Please enter a Name");
-			
-			setNewLocationPanesVisibility(false);
+			save();
 		}
 	});
 	table.addKeyListener(new KeyListener() {
@@ -308,13 +298,7 @@ public class OperationsManagerForm extends ProgFrame
 			
 			if(e.getKeyCode()==KeyEvent.VK_ENTER && table.getSelectedRow()!=-1)
 			{
-				if(newLocationName.textField.getText().length()>0)
-					saveNewLocation();
-
-				if(newLocationName.textField.getText().length()>0 || !newLocationName.isVisible())
-				saveOperations();
-				else
-					setTitle("Error Saving, Please enter a Name");
+				save();
 			}
 			else if(e.getKeyCode()==KeyEvent.VK_BACK_SLASH && table.getSelectedRow()!=-1)
 			{
@@ -332,6 +316,7 @@ public class OperationsManagerForm extends ProgFrame
 			}
 		}
 
+
 		public void keyTyped(KeyEvent e){}
 		public void keyReleased(KeyEvent e) {}
 	});	
@@ -339,8 +324,27 @@ public class OperationsManagerForm extends ProgFrame
 	this.setSize(700,650);
 	}
 
-	private void saveOperations() 
+
+	private void save() 
 	{
+		
+		if(operations == null)
+		{
+			saveNewLocation();
+			saveNewOperationTime();
+		}
+		else
+		{
+			saveNewOperationTime();
+		}	
+	}
+	
+	private void loadOperationsDataFromGrid() 
+	{
+		if(location == null)
+		{
+			location = new LocationData(new JsonObject(""));
+		}
 
 		this.setTitle(location.getName()+" Operations Saving Data...");
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -357,17 +361,15 @@ public class OperationsManagerForm extends ProgFrame
 			data.setEndMinute(Integer.parseInt(endTime[1]));
 			data.setEndAm(endTime[2].charAt(0)=='a'?true:false);
 		}
-		saveNewOperationTime();
 
-		this.setTitle(location.getName()+" Operations Save Complete.");
 
 	}
 	private TimeBlock findTimeBlockById(String id)
 	{
 		TimeBlock data = null;
-		for(int i =0;i<operations.times.size();i++)
+		for(int i =0;i<operations.size();i++)
 		{
-			for(TimeBlock current : operations.times.get(i))
+			for(TimeBlock current : operations.get(i))
 			{
 				if(current.getId().equals(id))
 				{
@@ -380,12 +382,11 @@ public class OperationsManagerForm extends ProgFrame
 	private final String am="am";
 	private void saveNewOperationTime()
 	{	
-
-
 		this.setTitle(location.getName()+" Operations  Saving New Operations...");
+
+		loadOperationsDataFromGrid();
 		System.out.println("Data Before Save New Operations: "+location.jsonify());
 		String start = (String) comboStartTimes.getSelectedItem();
-		System.out.println(start);
 		String startHour = start.split(":")[0];
 		String startMinute = start.split(":")[1].split(" ")[0];
 		boolean isStartAm = start.split(":")[1].split(" ")[1].equals(am);
@@ -395,7 +396,7 @@ public class OperationsManagerForm extends ProgFrame
 		String endMinute = end.split(":")[1].split(" ")[0];
 		boolean isEndAm = end.split(":")[1].split(" ")[1].equals(am);
 		
-		for(int i=0;i<7;i++)
+		for(int i=0;i<DayOfWeekSelector.DAY_COUNT;i++)
 		{
 			if(daySelector.isSelectedByIndex(i))
 			{
@@ -411,9 +412,11 @@ public class OperationsManagerForm extends ProgFrame
 		daySelector.clear();
 		comboStartTimes.setSelectedIndex(0);
 		comboEndTimes.setSelectedIndex(0);
+		
+		
 		System.out.println("Data After Save New Operations: "+location.jsonify());
 		try {
-			AdminDirectoryMain.HTTP.putJsonString("locations/"+location.getId(), location.jsonify());
+			AdminDirectoryMain.HTTP.putJsonString("locations:"+location.getId(), location.jsonify());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -442,6 +445,8 @@ public class OperationsManagerForm extends ProgFrame
 		newLocationName.setVisible(isVisible);
 		newLocationRoom.setVisible(isVisible);
 		newLocationAddress.setVisible(isVisible);
+		newLocationEmail.setVisible(isVisible);
+		newLocationPhone.setVisible(isVisible);
 	}
 	public void clearTable()
 	{
@@ -453,7 +458,11 @@ public class OperationsManagerForm extends ProgFrame
 		this.setTitle("Locations Editor Saving New Location");
 		LocationData newData = new LocationData(newLocationName.textField.getText(),
 				newLocationRoom.textField.getText(),
-				newLocationAddress.textField.getText());
+				newLocationAddress.textField.getText(),
+				newLocationEmail.textField.getText(),
+				newLocationPhone.textField.getText());
+
+		
 		try {
 			String response = AdminDirectoryMain.HTTP.postJsonStringReturnResp("locations", newData.jsonify());
 			JsonObjectification data = new JsonObjectification(response);
@@ -469,7 +478,14 @@ public class OperationsManagerForm extends ProgFrame
 	public void onLoad() {}
 
 	@Override
-	public void onClose() {}
+	public void onClose() 
+	{
+		clearTable();
+		newLocationName.textField.setText("");
+		newLocationRoom.textField.setText("");
+		newLocationAddress.textField.setText("");
+		setNewLocationPanesVisibility(false);
+	}
 
 	@Override
 	public void whileRunning() 

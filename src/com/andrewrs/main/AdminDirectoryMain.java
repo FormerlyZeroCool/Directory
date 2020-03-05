@@ -20,14 +20,14 @@ public class AdminDirectoryMain
 	public static void main(String args[])
 	{
 		try {
-			HTTP=new HTTPHandler("your Web Service URL");
+			HTTP=new HTTPHandler(remoteUrl);
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
 		
 		LoginForm login = new LoginForm("Login");
 
-		while(login.isLoggedIn())
+		while(!login.isLoggedIn())
 		{
 			try {
 				Thread.sleep(30);
@@ -35,14 +35,15 @@ public class AdminDirectoryMain
 				e.printStackTrace();
 			}
 		}
+		//login.currentUser.setAdmin(false);
 		login.setVisible(false);
 		ProgFrameHandler frame = new ProgFrameHandler();
 		try {
 			ProgramState.addFrame(OPERATIONSMANAGERFORM);
-		LocationManagerForm locationManager = new LocationManagerForm(login.currentUser);
-		ProgramState.addFrame(locationManager);
-		ProgramState.addFrame(new UserManagerForm(login.currentUser));
-		ProgramState.addFrame(new NewUserForm(login.currentUser));
+			LocationManagerForm locationManager = new LocationManagerForm(login.currentUser);
+			ProgramState.addFrame(locationManager);
+			ProgramState.addFrame(new UserManagerForm(login.currentUser));
+			ProgramState.addFrame(new NewUserForm(login.currentUser));
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

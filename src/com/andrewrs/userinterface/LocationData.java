@@ -13,31 +13,49 @@ public class LocationData
 	public OperationsData locationOperations;
 	public LocationData(JsonObject data)//Should be an individual location's Data
 	{
-		id = data.getChild("_id").getData();
+		JsonObject _idObj = data.getChild("_id");
+		if(_idObj != null)
+			this.id = _idObj.getData();
+		else 
+			this.id = "";
 		
 		if(data.getChild("Name")!=null)
-			name = data.getChild("Name").getData();
+			this.name = data.getChild("Name").getData();
+		else
+			this.name = "";
 
 		if(data.getChild("Room")!=null)
-			room = data.getChild("Room").getData();
+			this.room = data.getChild("Room").getData();
+		else
+			this.room = "";
 
 		if(data.getChild("Address")!=null)
 			setAddress(data.getChild("Address").getData());
+		else
+			setAddress("");
 
 		if(data.getChild("Operations")!=null)
 			locationOperations = new OperationsData(data.getChild("Operations"),this);
+		else
+			locationOperations = new OperationsData(new JsonObject(""),this);
 
 		if(data.getChild("Telephone")!=null)
-			setAddress(data.getChild("Address").getData());
+			setTelephone(data.getChild("Telephone").getData());
+		else
+			setTelephone("");
 
 		if(data.getChild("ContactEmail")!=null)
-			locationOperations = new OperationsData(data.getChild("Operations"),this);
+			contactEmail = data.getChild("ContactEmail").getData();
+		else
+			contactEmail = "";
 	}
-	public LocationData(String name,String room,String address)
+	public LocationData(String name,String room,String address,String email,String phone)
 	{
 		this.name=name;
 		this.room=room;
 		this.address=address;
+		this.contactEmail = email;
+		this.telephone = phone;
 		JsonObjectification emptyOperations = 
 				new JsonObjectification("{\"Operations\":{\"Monday\":[],\"Tuesday\":[],\"Wednesday\":[],\"Thursday\":[],\"Friday\":[],\"Saturday\":[],\"Sunday\":[]}}");
 		locationOperations = new OperationsData(emptyOperations.jsonObject.getChild("Operations"),this);
@@ -65,7 +83,7 @@ public class LocationData
 	public void save()
 	{
 		try {
-				AdminDirectoryMain.HTTP.putJsonString("locations/"+id, this.jsonify());
+				AdminDirectoryMain.HTTP.putJsonString("locations:"+id, this.jsonify());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -19,6 +19,10 @@ import javax.swing.JLabel;
 import java.awt.GridLayout;
 import javax.swing.JTextField;
 import java.awt.event.KeyAdapter;
+import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 public class LocationManagerForm extends ProgFrame
 {
@@ -33,6 +37,8 @@ public class LocationManagerForm extends ProgFrame
 	private final JTextField textFieldLocationNameFilter;
 	private final JTextField textFieldLocationRoomFilter;
 	private final JTextField textFieldLocationAddressFilter;
+	private final JTextField textFieldLocationEmailFilter;
+	private final JTextField textFieldLocationPhoneFilter;
 	public void refreshLocationsData()
 	{
 		locations.clear();
@@ -64,18 +70,23 @@ public class LocationManagerForm extends ProgFrame
 		{
 			if(locations.get(i).getName().toLowerCase().contains(textFieldLocationNameFilter.getText().toLowerCase()) &&
 					locations.get(i).getRoom().toLowerCase().contains(textFieldLocationRoomFilter.getText().toLowerCase()) &&
-					locations.get(i).getAddress().toLowerCase().contains(textFieldLocationAddressFilter.getText().toLowerCase()) )
+					locations.get(i).getAddress().toLowerCase().contains(textFieldLocationAddressFilter.getText().toLowerCase()) &&
+					locations.get(i).getContactEmail().toLowerCase().contains(textFieldLocationEmailFilter.getText().toLowerCase()) &&
+					locations.get(i).getTelephone().replaceAll("[^0-9]", "").contains(textFieldLocationPhoneFilter.getText().replaceAll("[^0-9]", "")))
 			{
 				data[i][0] = locations.get(i).getId();
 				data[i][1] = locations.get(i).getName();
 				data[i][2] = locations.get(i).getRoom();
 				data[i][3] = locations.get(i).getAddress();
-				data[i][4] = locations.get(i).getTelephone();
-				data[i][5] = locations.get(i).getContactEmail();
+				data[i][4] = locations.get(i).getContactEmail();
+				data[i][5] = locations.get(i).getTelephone();
 			    contactTableModel.addRow(data[i]);
 			    filteredLocations.add(locations.get(i));
 			}
 		}
+		   table.getColumnModel().getColumn(0).setMinWidth(0);
+		   table.getColumnModel().getColumn(0).setMaxWidth(0);
+		   table.getColumnModel().getColumn(0).setWidth(0);
 			if(selectedIndex != -1 && selectedIndex < table.getRowCount())
 				table.setRowSelectionInterval(selectedIndex, selectedIndex);
 
@@ -88,22 +99,11 @@ public class LocationManagerForm extends ProgFrame
 	locations = new ArrayList<LocationData>();
 	JPanel panel_1 = new JPanel();
 	getContentPane().add(panel_1, BorderLayout.SOUTH);
-	panel_1.setLayout(new GridLayout(0, 4, 0, 0));
+	panel_1.setLayout(new GridLayout(0, 5, 0, 0));
 	
-	JLabel lblNewLocationName = new JLabel("Name Filter:");
-	panel_1.add(lblNewLocationName);
-	
-	JLabel lblRoomNumber = new JLabel("Room Number Filter:");
-	panel_1.add(lblRoomNumber);
-	
-	JLabel lblAddress = new JLabel("Address Filter:");
-	panel_1.add(lblAddress);
-	
-	JLabel label = new JLabel("");
-	panel_1.add(label);
-	
-	textFieldLocationNameFilter = new JTextField();
-	panel_1.add(textFieldLocationNameFilter);
+	TextBoxPanel tpNewLocationName = new TextBoxPanel("Name Filter:");
+	panel_1.add(tpNewLocationName);
+	textFieldLocationNameFilter = tpNewLocationName.textField;
 	textFieldLocationNameFilter.setColumns(10);
 	textFieldLocationNameFilter.addKeyListener(new KeyAdapter() {
 		@Override
@@ -112,18 +112,20 @@ public class LocationManagerForm extends ProgFrame
 		}
 	});
 	
-	textFieldLocationRoomFilter = new JTextField();
+	TextBoxPanel tpRoomNumber = new TextBoxPanel("Room Number Filter:");
+	panel_1.add(tpRoomNumber);
+	textFieldLocationRoomFilter = tpRoomNumber.textField;
 	textFieldLocationRoomFilter.addKeyListener(new KeyAdapter() {
 		@Override
 		public void keyReleased(KeyEvent e) {
 			refreshTable();
 		}
 	});
-	panel_1.add(textFieldLocationRoomFilter);
 	textFieldLocationRoomFilter.setColumns(10);
 	
-	textFieldLocationAddressFilter = new JTextField();
-	panel_1.add(textFieldLocationAddressFilter);
+	TextBoxPanel tpAddress = new TextBoxPanel("Address Filter:");
+	panel_1.add(tpAddress);
+	textFieldLocationAddressFilter = tpAddress.textField;
 	textFieldLocationAddressFilter.setColumns(10);
 	textFieldLocationAddressFilter.addKeyListener(new KeyAdapter() {
 		@Override
@@ -133,10 +135,33 @@ public class LocationManagerForm extends ProgFrame
 		}
 	});
 	
-	JLabel label_1 = new JLabel("");
-	panel_1.add(label_1);
+
+	TextBoxPanel tpEmailFilter = new TextBoxPanel("Email Filter:");
+	panel_1.add(tpEmailFilter);
+	textFieldLocationEmailFilter = tpEmailFilter.textField;
+	tpEmailFilter.textField.addKeyListener(new KeyAdapter() {
+		@Override
+		public void keyReleased(KeyEvent e) {
+			refreshTable();
+		}
+	});
+	
+	TextBoxPanel tpPhoneFilter = new TextBoxPanel("Phone Filter:");
+	textFieldLocationPhoneFilter = tpPhoneFilter.textField;
+	tpPhoneFilter.textField.addKeyListener(new KeyAdapter() {
+		@Override
+		public void keyReleased(KeyEvent e) {
+			refreshTable();
+		}
+	});
+	panel_1.add(tpPhoneFilter);
+	
+	
+	JPanel panel = new JPanel();
+	panel_1.add(panel);
+	panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	final JButton btnViewOperations = new JButton("View Operations");
-	panel_1.add(btnViewOperations);
+	panel.add(btnViewOperations);
 	btnViewOperations.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -147,6 +172,8 @@ public class LocationManagerForm extends ProgFrame
 				 if(locations.get(j).getId().equals(table.getValueAt(table.getSelectedRow(), 0)))
 				 {
 					 ProgramState.setState("OperationManager");
+					 AdminDirectoryMain.OPERATIONSMANAGERFORM.setData(
+								getLocationOperationsData(getSelectedLocationIndex()));
 				 }
 			 }
 				 
@@ -154,8 +181,11 @@ public class LocationManagerForm extends ProgFrame
 		}
 	});
 	
+	JPanel panel_3 = new JPanel();
+	panel_1.add(panel_3);
+	
 	final JButton btnNewLocation = new JButton("Save New Location");
-	panel_1.add(btnNewLocation);
+	panel_3.add(btnNewLocation);
 	
 	btnNewLocation.addMouseListener(new MouseAdapter() {
 		@Override
@@ -166,8 +196,11 @@ public class LocationManagerForm extends ProgFrame
 
 	});
 	
+	JPanel panel_4 = new JPanel();
+	panel_1.add(panel_4);
+	
 	JButton btnRefreshTable = new JButton("Save/Refresh");
-	panel_1.add(btnRefreshTable);
+	panel_4.add(btnRefreshTable);
 	btnRefreshTable.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -178,8 +211,18 @@ public class LocationManagerForm extends ProgFrame
 			
 		}
 	});
+
+	panel_1.add(new JLabel(""));
+	panel_1.add(new JLabel(""));
+	panel_1.add(new JLabel(""));
+	panel_1.add(new JLabel(""));
+	panel_1.add(new JLabel(""));
+	panel_1.add(new JLabel(""));
+	
+	JPanel panel_5 = new JPanel();
+	panel_1.add(panel_5);
 	final JButton btnDeleteLocation = new JButton("Delete Location");
-	panel_1.add(btnDeleteLocation);
+	panel_5.add(btnDeleteLocation);
 	btnDeleteLocation.addMouseListener(new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -210,7 +253,8 @@ public class LocationManagerForm extends ProgFrame
 	};
 	table=new JTable(model);
 	panel_2.add(table, BorderLayout.CENTER);
-	String headers[]= {"ID","Name","Room","Address","Contact Email","Telephone"};
+	String headers[]= {"ID","Name","Room","Address","Contact Email","Telephone"
+			};
     DefaultTableModel contactTableModel = (DefaultTableModel) table
             .getModel();
     contactTableModel.setColumnIdentifiers(headers);
@@ -290,14 +334,12 @@ public class LocationManagerForm extends ProgFrame
 		if(this.getSelectedLocationIndex()>-1)
 		{
 			operationsManagerForm.setNewLocationPanesVisibility(false);
-			operationsManagerForm.clearTable();
-			operationsManagerForm.setData(
-					this.getLocationOperationsData(
-							this.getSelectedLocationIndex()));
+			//
 		}
 		else
 		{
 			operationsManagerForm.setNewLocationPanesVisibility(true);
+			operationsManagerForm.clearTable();
 		}
 	}
 	@Override

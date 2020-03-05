@@ -119,6 +119,7 @@ public class LoginForm extends JFrame
 	protected void attemptLogin() {
 
 		currentUser.getPassFromWeb();
+		System.out.println(hashPass(passwordTB.getPassword()));
 		if(hashPass(passwordTB.getPassword()).equals(currentUser.getHashedPass()))
 			currentUser.setLoggedIn(true);
 		
@@ -132,10 +133,17 @@ public class LoginForm extends JFrame
 	public static BigInteger hashPass(char[] cs)
 	{
 		BigInteger hash=new BigInteger("0");
+		//toLower
+		for(int i = 0;i < cs.length;i++)
+		{
+			if(cs[i] < 97)
+				cs[i] = (char) (cs[i]-32);
+		}
 		for(long i=0;i<cs.length;i++)
 		{
 			long charIndex=(int)cs[(int) i];
 			hash=hash.add(new BigInteger(Long.toString((i*65536L+charIndex)<<2)).add(hash));
+			hash = hash.multiply(new BigInteger("3"));
 		}
 		hash=hash.add(salt.add(hash));
 		return hash;
